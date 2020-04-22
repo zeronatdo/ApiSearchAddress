@@ -1,17 +1,19 @@
 package com.training.apisearchaddress.web;
 
-import com.training.apisearchaddress.model.errormessage.ErrorMessage;
 import com.training.apisearchaddress.model.SearchAddressService;
 import com.training.apisearchaddress.model.adressresponse.AddressResponse;
 import com.training.apisearchaddress.model.cityresponse.CityResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.HashMap;
 import java.util.List;
 
@@ -20,6 +22,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("post_offices")
+@Validated
 public class ApiSearchAddressController {
 	
 	@Autowired
@@ -33,19 +36,14 @@ public class ApiSearchAddressController {
 	 * @return danh sách địa chỉ cần tìm
 	 */
 	@RequestMapping(value = "/post/{postCode}", method = RequestMethod.GET)
-	public ResponseEntity<Object> searchByPostCode(@PathVariable("postCode") String postCode) {
-		//Loại bỏ space và dấu gạch ngang
-		postCode = postCode.replace(" ", "").replace("-", "");
-		
-		//Kiểm tra postCode có đúng định dạng hay không. Nếu đúng thì thực hiện tìm kiếm. Nếu sai thì in ra thông báo lỗi
-		if (!postCode.matches("\\d*")) {
-			ErrorMessage errorMessage = new ErrorMessage();
-			errorMessage.setError(400);
-			errorMessage.setError_description(
-					"Thiếu thông số bắt buộc, giá trị không hợp lệ hoặc request không đúng định dạng.");
-			return ResponseEntity.badRequest().body(errorMessage);
-		}
+	public ResponseEntity<Object> searchByPostCode(
+			@Pattern(regexp = "[\\d- ]*") @NotNull @PathVariable("postCode") String postCode) {
+		postCode = postCode.replace("-", "").replace(" ", "");
 		List<AddressResponse> addressResponseList = searchAddressService.searchByPostCode(postCode);
+		//Xử lý khi không có kết quả trả về
+		if (addressResponseList.isEmpty()) {
+			throw new IndexOutOfBoundsException();
+		}
 		HashMap<String, Object> hashMap = new HashMap<>();
 		hashMap.put("data", addressResponseList);
 		return new ResponseEntity<>(hashMap, HttpStatus.OK);
@@ -58,19 +56,14 @@ public class ApiSearchAddressController {
 	 * @return danh sách địa chỉ cần tìm
 	 */
 	@RequestMapping(value = "/prefectures/{prefectureCode}", method = RequestMethod.GET)
-	public ResponseEntity<Object> searchByPrefectureCode(@PathVariable("prefectureCode") String prefectureCode) {
-		//Loại bỏ space và dấu gạch ngang
-		prefectureCode = prefectureCode.replace(" ", "").replace("-", "");
-		
-		//Kiểm tra prefectureCode có đúng định dạng hay không. Nếu đúng thì thực hiện tìm kiếm. Nếu sai thì báo lỗi
-		if (!prefectureCode.matches("\\d*")) {
-			ErrorMessage errorMessage = new ErrorMessage();
-			errorMessage.setError(400);
-			errorMessage.setError_description(
-					"Thiếu thông số bắt buộc, giá trị không hợp lệ hoặc request không đúng định dạng.");
-			return ResponseEntity.badRequest().body(errorMessage);
-		}
+	public ResponseEntity<Object> searchByPrefectureCode(
+			@Pattern(regexp = "[\\d- ]*") @NotNull @PathVariable("prefectureCode") String prefectureCode) {
+		prefectureCode = prefectureCode.replace("-", "").replace(" ", "");
 		List<CityResponse> cityResponseList = searchAddressService.searchByPrefectureCode(prefectureCode);
+		//Xử lý khí không có kết quả trả về
+		if (cityResponseList.isEmpty()) {
+			throw new IndexOutOfBoundsException();
+		}
 		HashMap<String, List<CityResponse>> hashMap = new HashMap<>();
 		hashMap.put("data", cityResponseList);
 		return new ResponseEntity<>(hashMap, HttpStatus.OK);
