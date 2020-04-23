@@ -1,19 +1,22 @@
 package com.training.apisearchaddress.model.adressresponse;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 /**
  * Entity của địa chỉ người dùng tìm kiếm theo postCode
  */
 @Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 public class AddressResponse {
 	
 	@Column(name = "code")
@@ -71,7 +74,7 @@ public class AddressResponse {
 	
 	@Column(name = "multi_area")
 	@JsonProperty("multi_area")
-	private String multiArea;
+	private int multiArea;
 	
 	@Column(name = "update_show")
 	@JsonProperty("update_show")

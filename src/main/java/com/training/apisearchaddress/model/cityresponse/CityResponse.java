@@ -1,7 +1,10 @@
 package com.training.apisearchaddress.model.cityresponse;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +15,8 @@ import javax.persistence.Id;
  */
 @Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 public class CityResponse {
 	
 	@Column(name = "code")
