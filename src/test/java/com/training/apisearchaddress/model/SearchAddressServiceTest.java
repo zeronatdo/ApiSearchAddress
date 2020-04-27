@@ -4,15 +4,11 @@ import com.training.apisearchaddress.model.adressresponse.AddressResponse;
 import com.training.apisearchaddress.model.adressresponse.AddressResponseRepo;
 import com.training.apisearchaddress.model.cityresponse.CityResponse;
 import com.training.apisearchaddress.model.cityresponse.CityResponseRepo;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,9 +18,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class SearchAddressServiceTest {
-    private MockMvc mockMvc;
 
     @InjectMocks
     private SearchAddressService searchAddressService;
@@ -34,12 +29,6 @@ public class SearchAddressServiceTest {
 
     @Mock
     private CityResponseRepo cityResponseRepo;
-
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(searchAddressService).build();
-    }
 
     @Test
     public void testSeachByPostCode() {
