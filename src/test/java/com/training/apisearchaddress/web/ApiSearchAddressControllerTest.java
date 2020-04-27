@@ -1,8 +1,7 @@
 package com.training.apisearchaddress.web;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.training.apisearchaddress.model.SearchAddressService;
-import com.training.apisearchaddress.model.adressresponse.AddressResponse;
-import com.training.apisearchaddress.model.cityresponse.CityResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,10 +9,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Arrays;
+import java.util.Collections;
+
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -35,31 +39,24 @@ public class ApiSearchAddressControllerTest {
 	
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
 		mockMvc = MockMvcBuilders.standaloneSetup(apiSearchAddressController).build();
 	}
-	
+
 	@Test
 	public void testSearchByPostCode() throws Exception {
-		AddressResponse addressResponse1 = new AddressResponse("1", "hanoi", "hanoikana", "hanoiT", "hanoiTkana",
-				"1", "CauGiay", "CauGiayKana", 0, 0, 0, "1", "1", 0, 0, 0);
-		AddressResponse addressResponse2 = new AddressResponse("2", "hanoi", "hanoikana", "hanoiT", "hanoiTkana",
-				"2", "CauGiay", "CauGiayKana", 0, 0, 0, "2", "2", 0, 0, 0);
-		when(searchAddressService.searchByPostCode("1"))
-			.thenReturn(Arrays.asList(addressResponse1, addressResponse2));
-		mockMvc.perform(get("/post_offices/post/{postCode}", "1"))
+		String postCode = "0010020";
+		mockMvc.perform(get("/post_offices/post/{postCode}", postCode))
 			.andExpect(status().isOk());
-		verify(searchAddressService, times(1)).searchByPostCode("1");
+		verify(searchAddressService, times(1)).searchByPostCode(postCode);
 		verifyNoMoreInteractions(searchAddressService);
 	}
 	
 	@Test
 	public void testSearchByPrefectureCode() throws Exception {
-		CityResponse cityResponse1 = new CityResponse("1", "hanoi", "hanoikana", "hanoit", "hanoiTkana", "1");
-		CityResponse cityResponse2 = new CityResponse("2", "hanoi", "hanoikana", "hanoit", "hanoiTkana", "2");
-		when(searchAddressService.searchByPrefectureCode("1")).thenReturn(Arrays.asList(cityResponse1, cityResponse2));
-		mockMvc.perform(get("/post_offices/prefectures/{prefectureCode}", "1"));
-		verify(searchAddressService, times(1)).searchByPrefectureCode("1");
+		String prefectureCode = "01";
+		when(searchAddressService.searchByPostCode(any())).thenReturn(Collections.emptyList());
+		mockMvc.perform(get("/post_offices/prefectures/{prefectureCode}", prefectureCode));
+		verify(searchAddressService, times(1)).searchByPrefectureCode(prefectureCode);
 		verifyNoMoreInteractions(searchAddressService);
 	}
 }
