@@ -4,6 +4,7 @@ import com.training.apisearchaddress.model.adressresponse.AddressResponse;
 import com.training.apisearchaddress.model.adressresponse.AddressResponseRepo;
 import com.training.apisearchaddress.model.cityresponse.CityResponse;
 import com.training.apisearchaddress.model.cityresponse.CityResponseRepo;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,13 +14,12 @@ import java.util.List;
  * Service xử lý các request truy vấn vào database
  */
 @Service
+@RequiredArgsConstructor
 public class SearchAddressService {
-	
-	@Autowired
-	private AddressResponseRepo addressResponseRepo;
-	
-	@Autowired
-	private CityResponseRepo cityResponseRepo;
+
+	private final AddressResponseRepo addressResponseRepo;
+
+	private final CityResponseRepo cityResponseRepo;
 	
 	
 	/**
