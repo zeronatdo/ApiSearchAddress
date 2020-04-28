@@ -3,6 +3,7 @@ package com.training.apisearchaddress.web;
 import com.training.apisearchaddress.model.SearchAddressService;
 import com.training.apisearchaddress.model.adressresponse.AddressResponse;
 import com.training.apisearchaddress.model.cityresponse.CityResponse;
+import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +25,10 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 public class ApiSearchAddressController {
-
+	
 	private final SearchAddressService searchAddressService;
-
-
+	
+	
 	/**
 	 * Method tìm kiếm theo PostCode
 	 *
@@ -35,17 +36,12 @@ public class ApiSearchAddressController {
 	 * @return danh sách địa chỉ cần tìm
 	 */
 	@RequestMapping(value = "/post/{postCode}", method = RequestMethod.GET)
-	public ResponseEntity<Object> searchByPostCode(
-			@Pattern(regexp = "[\\d- ]*") @PathVariable("postCode") String postCode) {
-		postCode = postCode.replace("-", "").replace(" ", "");
+	public ResponseEntity<?> searchByPostCode(
+			@Pattern(regexp = "[\\d- ]*") @PathVariable("postCode") String postCode) throws NotFoundException {
 		List<AddressResponse> addressResponseList = searchAddressService.searchByPostCode(postCode);
-		//Xử lý khi không có kết quả trả về
-		if (addressResponseList.isEmpty()) {
-			throw new IndexOutOfBoundsException();
-		}
 		HashMap<String, Object> hashMap = new HashMap<>();
 		hashMap.put("data", addressResponseList);
-		return new ResponseEntity<>(hashMap, HttpStatus.OK);
+		return ResponseEntity.ok(hashMap);
 	}
 	
 	/**
@@ -55,16 +51,12 @@ public class ApiSearchAddressController {
 	 * @return danh sách địa chỉ cần tìm
 	 */
 	@RequestMapping(value = "/prefectures/{prefectureCode}", method = RequestMethod.GET)
-	public ResponseEntity<Object> searchByPrefectureCode(
-			@Pattern(regexp = "[\\d- ]*") @PathVariable("prefectureCode") String prefectureCode) {
-		prefectureCode = prefectureCode.replace("-", "").replace(" ", "");
+	public ResponseEntity<?> searchByPrefectureCode(
+			@Pattern(regexp = "[\\d- ]*") @PathVariable("prefectureCode") String prefectureCode)
+			throws NotFoundException {
 		List<CityResponse> cityResponseList = searchAddressService.searchByPrefectureCode(prefectureCode);
-		//Xử lý khí không có kết quả trả về
-		if (cityResponseList.isEmpty()) {
-			throw new IndexOutOfBoundsException();
-		}
 		HashMap<String, List<CityResponse>> hashMap = new HashMap<>();
 		hashMap.put("data", cityResponseList);
-		return new ResponseEntity<>(hashMap, HttpStatus.OK);
+		return ResponseEntity.ok(hashMap);
 	}
 }

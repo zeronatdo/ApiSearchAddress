@@ -1,42 +1,91 @@
-plugins {
-    id 'org.springframework.boot' version '2.2.6.RELEASE'
-    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
-    id 'java'
+buildscript {
+	repositories {
+		jcenter()
+		mavenCentral()
+		maven { url "https://plugins.gradle.org/m2/" }
+	}
+	dependencies {
+		classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotlessVersion"
+		classpath "mysql:mysql-connector-java:$mysqlVersion"
+		classpath "org.flywaydb:flyway-gradle-plugin:$flywayVersion"
+		classpath "gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:$spotbugsPluginVersion"
+		classpath "org.springframework:spring-jdbc:$springJdbcVersion" // for java migration file
+	}
 }
 
-group = 'com.training'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
+plugins {
+	id "org.springframework.boot" version "$springBootVersion"
+	id "io.spring.dependency-management" version "1.0.9.RELEASE"
+	id "java"
+	id "org.flywaydb.flyway" version "$flywayVersion"
+	id "com.diffplug.gradle.spotless" version "$spotlessVersion"
+	id "com.github.spotbugs" version "$spotbugsPluginVersion"
+}
+
+apply from: 'gradle/quality/spotless.gradle'
+apply from: 'gradle/quality/spotbugs.gradle'
+
+group = "com.luvina.cuongtm"
+version = "0.0.1-SNAPSHOT"
+sourceCompatibility = "1.8"
 
 configurations {
-    developmentOnly
-    runtimeClasspath {
-        extendsFrom developmentOnly
-    }
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
+	developmentOnly
+	runtimeClasspath {
+		extendsFrom developmentOnly
+	}
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
 }
 
 repositories {
-    mavenCentral()
+	mavenCentral()
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtime('mysql:mysql-connector-java:8.0.18')
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
-    testCompile ('junit:junit')
-    testCompile ('org.mockito:mockito-core')
+	// spring
+	implementation "org.springframework.boot:spring-boot-starter-web"
+	implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+	implementation "org.springframework.boot:spring-boot-starter-jdbc"
+	// implementation "org.springframework.boot:spring-boot-starter-security"
+	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
+	// database
+	implementation "org.flywaydb:flyway-core:$flywayVersion"
+	runtimeOnly "mysql:mysql-connector-java:$mysqlVersion"
+
+	// other
+	// implementation "com.miragesql:miragesql:2.1.0"
+	// implementation "com.miragesql:miragesql-integration:2.1.0"
+	implementation "com.google.guava:guava:$guavaVersion"
+	compileOnly "org.projectlombok:lombok:$lombokVersion"
+	annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+
+	// testing
+	testImplementation("org.springframework.boot:spring-boot-starter-test") {
+		exclude group: "org.junit.vintage", module: "junit-vintage-engine"
+	}
+	testImplementation "org.springframework.security:spring-security-test"
+	testImplementation "com.h2database:h2:1.4.196"
+	testImplementation "org.springframework.boot:spring-boot-starter-test"
+	testImplementation "org.flywaydb.flyway-test-extensions:flyway-dbunit-test:6.1.0"
+	testImplementation "com.jayway.jsonpath:json-path-assert:2.4.0"
+	testCompileOnly "org.projectlombok:lombok:$lombokVersion"
+	testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
+
+	spotbugsPlugins "com.h3xstream.findsecbugs:findsecbugs-plugin:$findsecbugsVersion"
 }
 
 test {
-    useJUnit()
+	useJUnitPlatform()
+}
+
+// cannot move into gradle/quality/spotbugs.gradle
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
+	reports {
+		xml.enabled = false
+		html.enabled = true
+	}
+	pluginClasspath = project.configurations.spotbugsPlugins
 }

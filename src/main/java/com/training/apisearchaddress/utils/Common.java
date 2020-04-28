@@ -1,6 +1,7 @@
 package com.training.apisearchaddress.utils;
 
 import com.training.apisearchaddress.model.errormessage.ErrorMessage;
+import javassist.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -21,7 +22,7 @@ public class Common {
 	 * @return thông báo lỗi
 	 */
 	@ExceptionHandler({
-		IndexOutOfBoundsException.class,
+		NotFoundException.class,
 		NoHandlerFoundException.class
 	})
 	@ResponseStatus(value = HttpStatus.NOT_FOUND)
