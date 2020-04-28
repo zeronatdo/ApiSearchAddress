@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -31,10 +30,10 @@ public class ApiSearchAddressControllerTest {
 	private MockMvc mockMvc;
 	
 	@InjectMocks
-	private ApiSearchAddressController apiSearchAddressController;
+	ApiSearchAddressController apiSearchAddressController;
 	
 	@Mock
-	private SearchAddressService searchAddressService;
+	SearchAddressService searchAddressService;
 	
 	
 	@Before
@@ -44,7 +43,8 @@ public class ApiSearchAddressControllerTest {
 
 	@Test
 	public void testSearchByPostCode() throws Exception {
-		String postCode = "0010020";
+		String postCode = "1";
+		when(searchAddressService.searchByPostCode(any())).thenReturn(Collections.emptyList());
 		mockMvc.perform(get("/post_offices/post/{postCode}", postCode))
 			.andExpect(status().isOk());
 		verify(searchAddressService, times(1)).searchByPostCode(postCode);
@@ -53,8 +53,8 @@ public class ApiSearchAddressControllerTest {
 	
 	@Test
 	public void testSearchByPrefectureCode() throws Exception {
-		String prefectureCode = "01";
-		when(searchAddressService.searchByPostCode(any())).thenReturn(Collections.emptyList());
+		String prefectureCode = "1";
+		when(searchAddressService.searchByPrefectureCode(any())).thenReturn(Collections.emptyList());
 		mockMvc.perform(get("/post_offices/prefectures/{prefectureCode}", prefectureCode));
 		verify(searchAddressService, times(1)).searchByPrefectureCode(prefectureCode);
 		verifyNoMoreInteractions(searchAddressService);

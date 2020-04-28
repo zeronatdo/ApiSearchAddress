@@ -1,52 +1,115 @@
 package com.training.apisearchaddress.web;
 
-import com.training.apisearchaddress.ApiSearchAddressApplication;
 import com.training.apisearchaddress.model.SearchAddressService;
-import com.training.apisearchaddress.model.adressresponse.AddressResponse;
-import com.training.apisearchaddress.model.cityresponse.CityResponse;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Arrays;
+import static com.jayway.jsonassert.JsonAssert.with;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.util.AssertionErrors.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ApiSearchAddressApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 public class ApiSearchAddressControllerIntegrationTest {
-    @LocalServerPort
-    private int port;
-
-    @MockBean
-    private SearchAddressService searchAddressService;
-
-    @Autowired
-    private TestRestTemplate testRestTemplate;
-
-    @Test
+	
+	@MockBean
+	private SearchAddressService searchAddressService;
+	
+	@Autowired
+	private TestRestTemplate testRestTemplate;
+	
+	
+	private HttpHeaders createHttpHeaders() {
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+		return httpHeaders;
+	}
+	
+	@Test
     public void testSearchByPostCode() throws Exception {
+        HttpHeaders httpHeaders = createHttpHeaders();
+        String postCode = "0010000";
+        ResponseEntity<String> responseEntity = testRestTemplate.exchange("/post_offices/post/{postCode}",
+				HttpMethod.GET, new HttpEntity<>(httpHeaders), String.class, postCode);
+
+		assertThat(responseEntity.getStatusCode().equals(HttpStatus.OK));
+		with(responseEntity.getBody()).assertThat("$.data", hasSize(1));
     }
 
-    @Test
-    public void testSearchByPrefectureCode() throws Exception {
+	@Test
+	public void testSearchByPostCode_error400() {
+		HttpHeaders httpHeaders = createHttpHeaders();
+		String postCode = "abc";
+		ResponseEntity<String> responseEntity = testRestTemplate.exchange("/post_offices/post/{postCode}",
+				HttpMethod.GET, new HttpEntity<>(httpHeaders), String.class, postCode);
 
-    }
+		assertThat(responseEntity.getStatusCode().equals(HttpStatus.BAD_REQUEST));
+		with(responseEntity.getBody())
+				.assertThat("$.error", is(400))
+				.assertThat("$.error_description", is("Thiếu thông số bắt buộc, giá trị không hợp lệ hoặc request không đúng định dạng."));
+	}
+
+	@Test
+	public void testSearchByPostCode_error404() {
+		HttpHeaders httpHeaders = createHttpHeaders();
+		String postCode = "1001";
+		ResponseEntity<String> responseEntity = testRestTemplate.exchange("/post_offices/post/{postCode}",
+				HttpMethod.GET, new HttpEntity<>(httpHeaders), String.class, postCode);
+
+		assertThat(responseEntity.getStatusCode().equals(HttpStatus.NOT_FOUND));
+		with(responseEntity.getBody())
+				.assertThat("$.error", is(404))
+				.assertThat("$.error_description", is("Cố gắng thao tác một tài nguyên không tồn tại."));
+	}
+	
+	@Test
+	public void testSearchByPrefectureCode() throws Exception {
+		HttpHeaders httpHeaders = new HttpHeaders();
+		String prefectureCode = "01";
+		ResponseEntity<String> responseEntity = testRestTemplate.exchange("/post_offices/prefectures/{prefectureCode}",
+				HttpMethod.GET, new HttpEntity<>(httpHeaders), String.class, prefectureCode);
+		assertThat(responseEntity.getStatusCode().equals(HttpStatus.OK));
+		with(responseEntity.getBody()).assertThat("$.data", hasSize(1));
+	}
+
+	@Test
+	public void testSearchByPrefectureCode_error400() {
+		HttpHeaders httpHeaders = createHttpHeaders();
+		String postCode = "abc";
+		ResponseEntity<String> responseEntity = testRestTemplate.exchange("/post_offices/post/{postCode}",
+				HttpMethod.GET, new HttpEntity<>(httpHeaders), String.class, postCode);
+
+		assertThat(responseEntity.getStatusCode().equals(HttpStatus.BAD_REQUEST));
+		with(responseEntity.getBody())
+				.assertThat("$.error", is(400))
+				.assertThat("$.error_description", is("Thiếu thông số bắt buộc, giá trị không hợp lệ hoặc request không đúng định dạng."));
+	}
+
+	@Test
+	public void testSearchByPrefectureCode_error404() {
+		HttpHeaders httpHeaders = createHttpHeaders();
+		String postCode = "1001";
+		ResponseEntity<String> responseEntity = testRestTemplate.exchange("/post_offices/post/{postCode}",
+				HttpMethod.GET, new HttpEntity<>(httpHeaders), String.class, postCode);
+
+		assertThat(responseEntity.getStatusCode().equals(HttpStatus.NOT_FOUND));
+		with(responseEntity.getBody())
+				.assertThat("$.error", is(404))
+				.assertThat("$.error_description", is("Cố gắng thao tác một tài nguyên không tồn tại."));
+	}
 }
