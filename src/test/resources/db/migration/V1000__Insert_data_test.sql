@@ -3,4 +3,4 @@ INSERT INTO tbl_post(post_id,post_code,update_show,change_reason,multi_area) VAL
 INSERT INTO tbl_old_post(old_post_id,old_post_code) VALUES (1,'001');
 INSERT INTO tbl_city(city_id,prefecture_id,code,city,city_kana) VALUES (1,1,'01101','札幌市中央区','ｻｯﾎﾟﾛｼﾁｭｳｵｳｸ');
 INSERT INTO tbl_area(area_id,area_kana, area,city_id,chome_area,koaza_area,multi_post_area,post_id,old_post_id)
- VALUES (1,'ｲｶﾆｹｲｻｲｶﾞﾅｲﾊﾞｱｲ','以下に掲載がない場合',1	,0,0,0,1,1);
+VALUES (1,'ｲｶﾆｹｲｻｲｶﾞﾅｲﾊﾞｱｲ','以下に掲載がない場合',1	,0,0,0,1,1);
