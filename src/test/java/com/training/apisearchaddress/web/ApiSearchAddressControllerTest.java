@@ -1,6 +1,5 @@
 package com.training.apisearchaddress.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.training.apisearchaddress.model.SearchAddressService;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,9 +7,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
